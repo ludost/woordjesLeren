@@ -11,6 +11,7 @@ Question.prototype = {
   modes: {
     EXAM: 'Toets',
     EXAM_RETRY: 'Toets met herkansing',
+    PRACTICE_REMOVE: 'Oefenen met verwijdering',
     PRACTICE: 'Oefenen'
   },
   directions: {
@@ -68,8 +69,8 @@ Question.prototype = {
       if (typeof answer !== 'string') {
         return false
       }
-      let cleanAnswer = (' ' + answer).replace(/ de | het | een |\n/gi, ' ').replace(/ {2}/g, ' ').trim()
-      let cleanOrigin = (' ' + original).replace(/ de | het | een |\n/gi, ' ').replace(/ {2}/g, ' ').trim()
+      let cleanAnswer = (' ' + answer).replace(/ de | het | een |\n/gi, ' ').replace(/[\.,\!\?]/g,'').replace(/ {2}/g, ' ').trim()
+      let cleanOrigin = (' ' + original).replace(/ de | het | een |\n/gi, ' ').replace(/[\.,\!\?]/g,'').replace(/ {2}/g, ' ').trim()
       return cleanOrigin.localeCompare(cleanAnswer, undefined, { sensitivity: (this.accent?'accent':'base') }) === 0
     }
 
@@ -93,7 +94,7 @@ Question.prototype = {
       //if correct and "toets", remove from this.list
       this.list.splice(this.currentQuestion.idx, 1)
     }
-    if (!correct && this.mode === this.modes.EXAM_RETRY) {
+    if (!correct) {
       this.list[this.currentQuestion.idx].retryCount++
     }
     let answers = $('#answers')
@@ -113,9 +114,12 @@ Question.prototype = {
       '</div>'
     )
 
-    if (this.mode !== this.modes.PRACTICE) {
+    if (this.mode !== this.modes.PRACTICE && this.mode !== this.modes.PRACTICE_REMOVE) {
       answers.children().hide()
       answers.children(':first-child').show()
+      if (this.mode === this.modes.EXAM_RETRY){
+        answers.children(':nth-child(2)').show()
+      }
     }
 
     if (correct){
