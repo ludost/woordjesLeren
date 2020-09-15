@@ -64,6 +64,7 @@
           let list = editor.get()
           list.unshift(values)
           upload($('#addLijstjes option:selected').val(),list)
+          editor.set(list)
         }
         return false;
       }
