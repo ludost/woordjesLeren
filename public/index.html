@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Woorden leren</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/layout.css">
+
+    <script src="plugins/jquery-3.5.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="plugins/jquery-ui-themes-1.12.1/themes/base/jquery-ui.min.css">
+    <script src="plugins/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+
+    <script src="plugins/JQmultiselect/jquery.multiselect.js"></script>
+    <link rel="stylesheet" type="text/css" href="plugins/JQmultiselect/jquery.multiselect.css">
+
+    <script src="javascripts/lijstjes.js"></script>
+    <script src="javascripts/statistieken.js"></script>
+    <script src="javascripts/question.js"></script>
+</head>
+
+<body>
+<div id="header"><h1>Woorden leren</h1></div>
+<div class="row">
+    <div class="col-2">
+        <div class="row">Welke woorden lijst?</div>
+        <div class="row"><select id='lijstjes' multiple></select></div><br/>
+        <button class="ui-button ui-widget ui-corner-all" id="chgLijst">Aanpassen Lijstjes</button>
+    </div>
+    <div class="col-8">
+        <div class="row">
+            <div class="col-1">
+                <button class="ui-button ui-widget ui-corner-all" id="startButton">Start</button>
+                <br/><br/>
+                <button class="ui-button ui-widget ui-corner-all" id="stopButton">Stop</button>
+            </div>
+            <div class="col-3">
+                <fieldset id="mode_selector">
+                    <legend>Mode</legend>
+                    <label for="exam">Toets</label>
+                    <input type="radio" name="mode" id="exam" value="EXAM">
+                    <label for="exam_retry">Toets met herkansing</label>
+                    <input type="radio" name="mode" id="exam_retry" value="EXAM_RETRY" checked>
+                    <label for="practice">Oefenen</label>
+                    <input type="radio" name="mode" id="practice" value="PRACTICE">
+                </fieldset>
+            </div>
+            <div class="col-3">
+                <fieldset id="direction_selector">
+                    <legend>Richting</legend>
+                    <label for="there">Woord -> betekenis</label>
+                    <input type="radio" name="direction" id="there" value="THERE" checked>
+                    <label for="back">Betekenis -> Woord</label>
+                    <input type="radio" name="direction" id="back" value="BACK">
+                    <label for="both">Beide richtingen</label>
+                    <input type="radio" name="direction" id="both" value="BOTH">
+                </fieldset>
+            </div>
+            <div class="col-5" id="stats"><b>Statistieken:</b></div>
+        </div>
+        <div class="row" id="question" style="border: 1px solid blueviolet">
+        </div>
+        <div class="row" id="answers">
+        </div>
+    </div>
+</div>
+
+<script>
+  $('#lijstjes').multiselect({
+    columns: 1,
+    search: true,
+    selectAll: true
+  })
+  $('#mode_selector input').checkboxradio()
+  $('#direction_selector input').checkboxradio()
+
+  updateLists().then(data => {
+    //convert data to options
+    let lijstjes = $('#lijstjes');
+    let options = data.map(x => { return { name: cleanName(x), value: x }})
+    if (options.length > 0){
+      options[0].checked=true;
+    }
+    //Update multiselect
+    lijstjes.multiselect('loadOptions', options)
+    lijstjes.multiselect('select_all')
+  })
+
+
+  let question = new Question()
+  $('#startButton').button().click(function (event) {
+
+    $('#answers').html('')
+
+    question.mode = question.modes[$('#mode_selector input:checked').val()]
+    question.direction = question.directions[$('#direction_selector input:checked').val()]
+
+    getListContents($('#lijstjes').val()).then(
+      list => {
+        question.loadList(list.flat())
+        question.askQuestion()
+      }
+    ).catch(error => { alert(error.message)})
+    event.preventDefault()
+  })
+  $('#stopButton').button().click(function (event) {
+    question.stop()
+    event.preventDefault()
+  })
+
+</script>
+</body>
+</html>

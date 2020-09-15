@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lijst invoer</title>
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/layout.css">
+    <link rel="stylesheet" type="text/css" href="plugins/bootstrap/bootstrap.css">
+    <script src="plugins/jquery-3.5.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="plugins/jquery-ui-themes-1.12.1/themes/base/jquery-ui.min.css">
+    <script src="plugins/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+
+    <script src="plugins/jsv.js"></script>
+    <script src="plugins/underscore-min.js"></script>
+    <script src="plugins/jsonform.js"></script>
+
+    <script src="javascripts/lijstjes.js"></script>
+
+    <link href="plugins/jsoneditor/jsoneditor.css" rel="stylesheet" type="text/css">
+    <script src="plugins/jsoneditor/jsoneditor.js"></script>
+</head>
+<body>
+
+<div id="NewLijstje" title="Opstellen lijstje">
+    <div class="row">
+        <div class="col-1"><select id='addLijstjes'></select></div>
+        <div class="col-2"><input id="newLijst">
+            <button class="ui-button ui-widget ui-corner-all" id="nieuwButton">Nieuw</button>
+        </div>
+        <div class="col-2">
+            <button class="ui-button ui-widget ui-corner-all" id="rmButton">Gooi lijst weg (GEVAARLIJK!)</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <form id="lijstInvoer"></form>
+        </div>
+        <div class="col-8" id="jsoneditor"></div>
+    </div>
+</div>
+
+<script>
+  $('#lijstInvoer').html("").jsonForm(
+    {
+      'schema': {
+        'woord': {
+          'type': 'string',
+          'title': 'Woord:'
+        },
+        'betekenis': {
+          'type': 'array',
+          'items': {
+            'type': 'string',
+            'title': 'Betekenis:'
+          }
+        }
+      },
+      onSubmitValid: function (values) {
+        if (typeof values !== "undefined"){
+          let list = editor.get()
+          list.unshift(values)
+          upload($('#addLijstjes option:selected').val(),list)
+        }
+        return false;
+      }
+    })
+
+  let existing = []
+  $('#nieuwButton').button().click(function (event) {
+    let newname = $('#newLijst').val()
+    if (newname !== '') {
+      newname = newname.replace('.json', '') + '.json'
+      if (existing.includes(newname)) {
+        alert('Lijst met die naam bestaat al: ' + newname)
+      } else {
+        upload(newname, []).then(
+          () => pageUpdate(newname)
+        )
+      }
+    }
+    event.preventDefault()
+  })
+  $('#rmButton').button().click(function (event) {
+    rmLijst($('#addLijstjes option:selected').val()).then(
+      () => pageUpdate()
+    )
+    event.preventDefault()
+  })
+
+  const container = document.getElementById('jsoneditor')
+  const options = {
+    mode: 'code',
+    onChange: function () {
+      try {
+        //upload file
+        upload($('#addLijstjes option:selected').val(), editor.get()).then(
+          () => pageUpdate($('#addLijstjes option:selected').val())
+        )
+      } catch (e) {}
+    }
+  }
+  const editor = new JSONEditor(container, options)
+  const lijstjes = $('#addLijstjes')
+
+  function pageUpdate (selected) {
+    updateLists().then((data) => {
+      let first = typeof selected === 'undefined'
+      lijstjes.html('')
+      existing = data
+      data.map((item) => {
+        lijstjes.append('<option value="' + item + '" ' + ((first || item === selected) ? 'selected="selected"' : '') + '>' + item + '</option>')
+        first = false
+      })
+      lijstjes.trigger('change')
+    }).catch((reason) => {
+      console.log(reason)
+      editor.set([])
+    })
+  }
+
+  pageUpdate()
+  lijstjes.on('change', function () {
+    getListContents([$('#addLijstjes option:selected').val()]).then(
+      list => {
+        editor.set(list.flat())
+      }
+    ).catch(error => {
+      console.log(error)
+      editor.set([])
+    })
+  })
+</script>
+</body>
+</html>
