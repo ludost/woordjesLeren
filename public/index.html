@@ -26,7 +26,7 @@
     <div class="col-2">
         <div class="row">Welke woorden lijst?</div>
         <div class="row"><select id='lijstjes' multiple></select></div><br/>
-        <button class="ui-button ui-widget ui-corner-all" id="chgLijst">Aanpassen Lijstjes</button>
+        <a class="ui-button ui-widget ui-corner-all" id="chgLijst" href="lijstInvoer.html" target="_blank">Aanpassen Lijstjes</a>
     </div>
     <div class="col-8">
         <div class="row">
@@ -72,6 +72,7 @@
     search: true,
     selectAll: true
   })
+  $('#chgLijst').button()
   $('#mode_selector input').checkboxradio()
   $('#direction_selector input').checkboxradio()
 

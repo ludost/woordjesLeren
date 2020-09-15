@@ -30,7 +30,9 @@
             <button class="ui-button ui-widget ui-corner-all" id="nieuwButton">Nieuw</button>
         </div>
         <div class="col-2">
-            <button class="ui-button ui-widget ui-corner-all" id="rmButton">Gooi lijst weg (GEVAARLIJK!)</button>
+            <button class="ui-button ui-widget ui-corner-all" id="rm1Button">Gooi lijst weg (GEVAARLIJK!)</button>
+            <button class="ui-button ui-widget ui-corner-all" style="color:green" id="rm2Button">Toch niet!</button>
+            <button class="ui-button ui-widget ui-corner-all" style="color:red" id="rm3Button">Weet je het heel zeker?</button>
         </div>
     </div>
     <div class="row">
@@ -82,13 +84,32 @@
     }
     event.preventDefault()
   })
-  $('#rmButton').button().click(function (event) {
+  const but1 = $("#rm1Button").button();
+  const but2 = $("#rm2Button").button();
+  const but3 = $("#rm3Button").button();
+  but2.hide()
+  but3.hide()
+  but1.click(function (event) {
+    but1.hide()
+    but2.show()
+    but3.show()
+    event.preventDefault()
+  })
+  but2.click(function (event) {
+    but1.show()
+    but2.hide()
+    but3.hide()
+    event.preventDefault()
+  })
+  but3.click(function (event) {
     rmLijst($('#addLijstjes option:selected').val()).then(
       () => pageUpdate()
     )
+    but1.show()
+    but2.hide()
+    but3.hide()
     event.preventDefault()
   })
-
   const container = document.getElementById('jsoneditor')
   const options = {
     mode: 'code',
@@ -96,7 +117,7 @@
       try {
         //upload file
         upload($('#addLijstjes option:selected').val(), editor.get()).then(
-          () => pageUpdate($('#addLijstjes option:selected').val())
+          () => pageUpdate($('#addLijstjes option:selected').val(),true)
         )
       } catch (e) {}
     }
@@ -104,7 +125,7 @@
   const editor = new JSONEditor(container, options)
   const lijstjes = $('#addLijstjes')
 
-  function pageUpdate (selected) {
+  function pageUpdate (selected,skipEvent=false) {
     updateLists().then((data) => {
       let first = typeof selected === 'undefined'
       lijstjes.html('')
@@ -113,7 +134,7 @@
         lijstjes.append('<option value="' + item + '" ' + ((first || item === selected) ? 'selected="selected"' : '') + '>' + item + '</option>')
         first = false
       })
-      lijstjes.trigger('change')
+      if (!skipEvent) lijstjes.trigger('change')
     }).catch((reason) => {
       console.log(reason)
       editor.set([])
