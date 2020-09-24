@@ -87,11 +87,7 @@ Question.prototype = {
         break
     }
     if (correct && this.mode !== this.modes.PRACTICE) {
-      //if correct and "toets", remove from this.list
-      this.list.splice(this.currentQuestion.idx, 1)
-    }
-    if (correct && this.mode === this.modes.EXAM) {
-      //if correct and "toets", remove from this.list
+      //if correct and not Practice, remove from this.list
       this.list.splice(this.currentQuestion.idx, 1)
     }
     if (!correct) {
