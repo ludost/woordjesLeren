@@ -65,13 +65,14 @@ Question.prototype = {
     }
   },
   answerQuestion: function (answer) {
+    let me = this
     function checkAnswer (answer, original) {
       if (typeof answer !== 'string') {
         return false
       }
       let cleanAnswer = (' ' + answer).replace(/ de | het | een |\n/gi, ' ').replace(/[\.,\!\?]/g,'').replace(/ {2}/g, ' ').trim()
       let cleanOrigin = (' ' + original).replace(/ de | het | een |\n/gi, ' ').replace(/[\.,\!\?]/g,'').replace(/ {2}/g, ' ').trim()
-      return cleanOrigin.localeCompare(cleanAnswer, undefined, { sensitivity: (this.accent?'accent':'base') }) === 0
+      return cleanOrigin.localeCompare(cleanAnswer, undefined, { sensitivity: (me.accents?'accent':'base') }) === 0
     }
 
     let correct = false
@@ -104,7 +105,7 @@ Question.prototype = {
       '</div>' +
       '<div class="row" style="padding-bottom:5px;font-style:italic">' +
       '<div class="flat-col-1">' +
-      '</div><div class="flat-col-3">' + (direction === this.directions.BACK && !correct ? this.currentQuestion['woord'] : '') +
+      '</div><div class="flat-col-3">' + (direction === this.directions.BACK ? this.currentQuestion['woord'] : '') +
       '</div><div class="flat-col-8">' + this.currentQuestion['betekenis'].join('<br/>') +
       '</div>' +
       '</div>'

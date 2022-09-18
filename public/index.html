@@ -58,6 +58,7 @@
                     <label for="both">Beide richtingen</label>
                     <input type="radio" name="direction" id="both" value="BOTH">
                 </fieldset>
+		<input type="checkbox" id="accents_selector" value="true">Check accents?
             </div>
             <div class="col-5" id="stats"><b>Statistieken:</b></div>
         </div>
@@ -98,6 +99,9 @@
 
     question.mode = question.modes[$('#mode_selector input:checked').val()]
     question.direction = question.directions[$('#direction_selector input:checked').val()]
+    question.accents = $('#accents_selector').is(":checked")
+
+    console.log("Starting:",question)
 
     getListContents($('#lijstjes').val()).then(
       list => {
