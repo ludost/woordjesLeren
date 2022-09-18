@@ -58,7 +58,8 @@
                     <label for="both">Beide richtingen</label>
                     <input type="radio" name="direction" id="both" value="BOTH">
                 </fieldset>
-		<input type="checkbox" id="accents_selector" value="true">Check accents?
+		<input type="checkbox" id="accents_selector" value="true">Check accents?</br>
+		<input type="checkbox" id="case_selector" value="true">Case Sensitive?
             </div>
             <div class="col-5" id="stats"><b>Statistieken:</b></div>
         </div>
@@ -100,6 +101,7 @@
     question.mode = question.modes[$('#mode_selector input:checked').val()]
     question.direction = question.directions[$('#direction_selector input:checked').val()]
     question.accents = $('#accents_selector').is(":checked")
+    question.caseCheck = $('#case_selector').is(":checked")
 
     console.log("Starting:",question)
 

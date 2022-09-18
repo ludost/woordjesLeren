@@ -4,6 +4,8 @@ function Question () {
   this.mode = this.modes.EXAM_RETRY
   this.direction = this.directions.THERE
   this.accents = false
+  this.caseCheck = false
+  this.accentMode = "base"
   this.stats = new Stats()
 }
 
@@ -66,13 +68,14 @@ Question.prototype = {
   },
   answerQuestion: function (answer) {
     let me = this
+    me.accentMode = this.accents?(this.caseCheck?"variant":"accent"):(this.caseCheck?"case":"base")
     function checkAnswer (answer, original) {
       if (typeof answer !== 'string') {
         return false
       }
       let cleanAnswer = (' ' + answer).replace(/ de | het | een |\n/gi, ' ').replace(/[\.,\!\?]/g,'').replace(/ {2}/g, ' ').trim()
       let cleanOrigin = (' ' + original).replace(/ de | het | een |\n/gi, ' ').replace(/[\.,\!\?]/g,'').replace(/ {2}/g, ' ').trim()
-      return cleanOrigin.localeCompare(cleanAnswer, undefined, { sensitivity: (me.accents?'accent':'base') }) === 0
+      return cleanOrigin.localeCompare(cleanAnswer, undefined, { sensitivity: me.accentMode }) === 0
     }
 
     let correct = false
