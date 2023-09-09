@@ -1,27 +1,24 @@
-var fs = require('fs');
-
-var express = require('express');
-var router = express.Router();
+import express from "npm:express"
+export let router = express.Router();
 
 /* GET listing of existing lijstjes. */
 router
   .delete('/:name', function(req, res, next){
-    fs.unlinkSync("public/lijstjes/"+req.params.name);
-    let list = fs.readdirSync("public/lijstjes")
+    Deno.removeSync("./public/lijstjes/"+req.params.name);
+    let list = Array.from(Deno.readDirSync("./public/lijstjes"))
     res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(list))
+    res.send(JSON.stringify(list.map((item)=>{ return item.name })))
   })
   .post('/:name', function(req, res, next) {
     let newName = req.params.name;
-    fs.writeFileSync("public/lijstjes/"+newName,JSON.stringify(req.body))
-    let list = fs.readdirSync("public/lijstjes")
+    Deno.writeTextFileSync("./public/lijstjes/"+newName,JSON.stringify(req.body))
+    let list = Array.from(Deno.readDirSync("./public/lijstjes"))
     res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(list))
+    res.send(JSON.stringify(list.map((item)=>{ return item.name })))
   })
   .get('/', function(req, res, next) {
-    let list = fs.readdirSync("public/lijstjes")
+    let list = Array.from(Deno.readDirSync("./public/lijstjes"))
     res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(list))
+    res.send(JSON.stringify(list.map((item)=>{ return item.name })))
   });
 
-module.exports = router;
