@@ -1,0 +1,9 @@
+
+{
+    "fmt": {
+	"semiColons":false
+    },
+    "tasks": {
+	"run": "deno run --allow-net=0.0.0.0 --allow-write --allow-read --allow-env app.js"
+    }
+}
